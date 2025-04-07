@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      match /clients/{clientId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /invoices/{invoiceId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /contracts/{contractId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /projects/{projectId} {
+        allow read, write: if request.auth.uid == userId;
+        
+        match /tasks/{taskId} {
+          allow read, write: if request.auth.uid == userId;
+        }
+      }
+      
+      match /time-entries/{entryId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /expenses/{expenseId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+    
+    // Shared data collections
+    match /global-settings/{setting} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only admins can modify via functions
+    }
+    
+    // Admin-only access
+    match /admin/{document=**} {
+      allow read, write: if request.auth != null && 
+                          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Public data, if any
+    match /public/{document=**} {
+      allow read: if true;
+      allow write: if false; // Only allow write via server
+    }
+    
+    // Default rule - deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
