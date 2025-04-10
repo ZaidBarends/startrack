@@ -20,11 +20,10 @@ const AuthenticatedContent: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <img src= "./logo.svg" className="App-logo" alt="logo" />
-        <p>Welcome to StarTrack!</p>
-        <p style={{ fontSize: '16px' }}>
+        <header className="App-header">
+          <p>Welcome to StarTrack!</p>
           You are logged in as: {currentUser?.email}
-        </p>
+        </header>
         <button
           onClick={logout}
           style={{
